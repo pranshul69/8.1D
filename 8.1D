@@ -1,0 +1,40 @@
+import smbus
+import time
+import sys
+
+
+I2C_ADDR  = 0x23 # light sensor addressess
+
+
+bus = smbus.SMBus(1)  
+
+mode = 0x13	
+
+
+def convertToNumber(data):
+  result=(data[1] + (256 * data[0])) / 1.2
+  display(result)
+
+
+def readLight(address=I2C_ADDR):
+  data = bus.read_i2c_block_data(address, mode)
+  return convertToNumber(data)
+
+
+def display(value):
+    if(value >300):
+        print("The light is too bright." + format(value,'.2f') + " lux")
+    elif(value > 200 and value < 300):
+        print("The light is bright. " + format(value,'.2f') + " lux")
+    elif(value > 80 and value < 200):
+        print("The light is medium. " + format(value,'.2f') + " lux")    
+    elif(value > 20 and value < 80):
+        print("The light is dark." + format(value,'.2f') + " lux")
+    elif(value > 0 and value < 20):
+        print("The light is too dark. " + format(value,'.2f') + " lux")
+    else:
+        print("N/A")
+        
+while True:
+    value=readLight()
+    time.sleep(0.5)
